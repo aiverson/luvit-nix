@@ -92,7 +92,9 @@ let
     stdenv.mkDerivation ({
       buildPhase = ''
         echo database: `pwd`/.litdb.git >> litconfig
-        LIT_CONFIG=`pwd`/litconfig lit make . ./$pname ${luviBase} || echo work around bug
+        export LIT_CONFIG=`pwd`/litconfig
+        lit install || echo work around bug
+        lit make . ./$pname ${luviBase} || echo work around bug
       '';
       installPhase = ''
         mkdir -p $out/bin
