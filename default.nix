@@ -43,9 +43,9 @@ let
       description = "a lua runtime for applications";
       homepage = "https://github.com/luvit/luvi";
 
-      license = stdenv.lib.licenses.apsl20;
+      license = pkgs.lib.licenses.apsl20;
       maintainers = [ aiverson ];
-      platforms = stdenv.lib.platforms.linux;
+      platforms = pkgs.lib.platforms.linux;
     };
   };
 
@@ -82,9 +82,9 @@ let
       description = "packageing tool for luvit";
       homepage = "https://github.com/luvit/lit";
 
-      license = stdenv.lib.licenses.apsl20;
+      license = pkgs.lib.licenses.apsl20;
       maintainers = [ aiverson ];
-      platforms = stdenv.lib.platforms.linux;
+      platforms = pkgs.lib.platforms.linux;
     };
   };
 
@@ -121,9 +121,9 @@ let
       description = "a lua runtime for application";
       homepage = "https://github.com/luvit/luvi";
 
-      license = stdenv.lib.licenses.apsl20;
+      license = pkgs.lib.licenses.apsl20;
       maintainers = [ aiverson ];
-      platforms = stdenv.lib.platforms.linux;
+      platforms = pkgs.lib.platforms.linux;
     };
   };
 
