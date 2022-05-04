@@ -1,0 +1,44 @@
+{
+  "nodes": {
+    "luvit": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1642649424,
+        "narHash": "sha256-TNiD6GPnS8O2d53sJ52xWYqMAXrVJu2lkfXhf2jWuL0=",
+        "owner": "luvit",
+        "repo": "luvit",
+        "rev": "3f328ad928eb214f6438dd25fb9ee8b5c1e9255c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "luvit",
+        "repo": "luvit",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1650501692,
+        "narHash": "sha256-ApKf0/dc0SyB7zZ6yiiOQgcXAhCXxbSDyihHfRDIzx0=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "9887f024766aa27704d1f89f623efd1d063da92a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-21.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "luvit": "luvit",
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
