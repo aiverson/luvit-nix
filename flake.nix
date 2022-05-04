@@ -41,11 +41,11 @@
           outputHash = sha256;
         });
 
-      makeLitPackage = { buildInputs ? [ ], src, pname, ... }@args:
+      makeLitPackage = { buildInputs ? [ ], src, pname, litSha256, ... }@args:
         let
           deps = vendorLitDeps {
             inherit src pname;
-            sha256 = "sha256-3EYdIjxF6XvFE3Ft6qpx/gaySMKiZi3kKr2K7QPB+G0=";
+            sha256 = litSha256;
           };
         in stdenv.mkDerivation ({
           buildPhase = ''
@@ -71,6 +71,8 @@
       luvit = makeLitPackage rec {
         pname = "luvit";
         version = "2.17.0";
+
+        litSha256 = "sha256-3EYdIjxF6XvFE3Ft6qpx/gaySMKiZi3kKr2K7QPB+G0=";
 
         src = inputs.luvit;
 
