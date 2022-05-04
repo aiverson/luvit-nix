@@ -7,16 +7,83 @@
     };
   };
 
-  outputs = inputs@{ self, nixpkgs, luvit }: {
-    packages.x86_64-linux = let
-      pkgs = import nixpkgs {
-        system = "x86_64-linux";
+  outputs = inputs@{ self, nixpkgs, luvit }: let
+    pkgs = import nixpkgs {
+      system = "x86_64-linux";
+    };
+    aiverson = {
+      name = "Alex Iverson";
+      email = "alexjiverson@gmail.com";
+    };
+  in {
+    lib = with pkgs; with self.packages.${system}; rec {
+      makeLuviScript = name: source:
+        writeBinScript name "${luvi}/bin/luvi ${source} -- $@";
+      luviBase = writeScript "luvi" ''
+        #!${luvi}/bin/luvi --
+      '';
+      vendorLitDeps = { src, sha256, pname, ... }@args:
+        stdenv.mkDerivation({
+          name = "${pname}-vendoredpkgs";
+          buildInputs = [ lit curl cacert ];
+          phases = [ "unpackPhase" "configurePhase" "buildPhase" ];
+          buildPhase = ''
+            export HOME=./
+            mkdir -p $out
+            lit install || echo "work around bug"
+            cp -r ./deps $out
+          '';
+
+          inherit src;
+
+          outputHashMode = "recursive";
+          outputHashAlgo = "sha256";
+          outputHash = sha256;
+        });
+
+      makeLitPackage = { buildInputs ? [ ], src, pname, ... }@args:
+        let
+          deps = vendorLitDeps {
+            inherit src pname;
+            sha256 = "sha256-3EYdIjxF6XvFE3Ft6qpx/gaySMKiZi3kKr2K7QPB+G0=";
+          };
+        in stdenv.mkDerivation ({
+          buildPhase = ''
+            echo database: `pwd`/.litdb.git >> litconfig
+            export LIT_CONFIG=`pwd`/litconfig
+            ln -s ${deps} ./deps
+            lit install || echo work around bug
+            lit make . ./$pname ${luviBase} || echo work around bug
+          '';
+          installPhase = ''
+            mkdir -p $out/bin
+            cp ./$pname $out/bin/$pname
+          '';
+        } // args // {
+          buildInputs = [ lit curl ] ++ buildInputs;
+        });
+    };
+
+    # Specify the default package
+    defaultPackage.x86_64-linux = self.packages.x86_64-linux.luvit;
+
+    packages.x86_64-linux = with pkgs; with self.lib; rec {
+      luvit = makeLitPackage rec {
+        pname = "luvit";
+        version = "2.17.0";
+
+        src = inputs.luvit;
+
+        meta = {
+          description = "a lua runtime for application";
+          homepage = "https://github.com/luvit/luvi";
+
+          license = pkgs.lib.licenses.apsl20;
+          maintainers = [ aiverson ];
+          platforms = pkgs.lib.platforms.linux;
+        };
       };
-      aiverson = {
-        name = "Alex Iverson";
-        email = "alexjiverson@gmail.com";
-      };
-    in with pkgs; rec {
+
       luvi = stdenv.mkDerivation rec {
         pname = "luvi";
         version = "2.11.0";
@@ -58,11 +125,6 @@
         };
       };
 
-      makeLuviScript = name: source:
-        writeBinScript name "${luvi}/bin/luvi ${source} -- $@";
-      luviBase = writeScript "luvi" ''
-        #!${luvi}/bin/luvi --
-      '';
 
       lit = stdenv.mkDerivation rec {
         pname = "lit";
@@ -95,69 +157,6 @@
           platforms = pkgs.lib.platforms.linux;
         };
       };
-
-      vendorLitDeps = { src, sha256, pname, ... }@args:
-        stdenv.mkDerivation({
-          name = "${pname}-vendoredpkgs";
-          buildInputs = [ lit curl cacert breakpointHook ];
-          phases = [ "unpackPhase" "configurePhase" "buildPhase" ];
-          buildPhase = ''
-            export HOME=./
-            mkdir -p $out
-            lit install || echo "work around bug"
-            cp -r ./deps $out
-          '';
-
-          inherit src;
-
-          outputHashMode = "recursive";
-          outputHashAlgo = "sha256";
-          outputHash = sha256;
-        });
-
-      makeLitPackage = { buildInputs ? [ ], src, pname, ... }@args:
-        let
-          deps = vendorLitDeps {
-            inherit src pname;
-            sha256 = "sha256-3EYdIjxF6XvFE3Ft6qpx/gaySMKiZi3kKr2K7QPB+G0=";
-          };
-        in stdenv.mkDerivation ({
-          buildPhase = ''
-            echo database: `pwd`/.litdb.git >> litconfig
-            export LIT_CONFIG=`pwd`/litconfig
-            ln -s ${deps} ./deps
-            lit install || echo work around bug
-            lit make . ./$pname ${luviBase} || echo work around bug
-          '';
-          installPhase = ''
-            mkdir -p $out/bin
-            cp ./$pname $out/bin/$pname
-          '';
-        } // args // {
-          buildInputs = [ lit curl ] ++ buildInputs;
-        });
-
-      luvit = makeLitPackage rec {
-        pname = "luvit";
-        version = "2.17.0";
-
-        src = inputs.luvit;
-
-        meta = {
-          description = "a lua runtime for application";
-          homepage = "https://github.com/luvit/luvi";
-
-          license = pkgs.lib.licenses.apsl20;
-          maintainers = [ aiverson ];
-          platforms = pkgs.lib.platforms.linux;
-        };
-      };
-
-      lua = lua52Packages.lua.withPackages (p: with p; [ lpeg ]);
-
     };
-
-      # Specify the default package
-    defaultPackage.x86_64-linux = self.packages.x86_64-linux.luvit;
   };
 }
