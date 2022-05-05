@@ -130,13 +130,13 @@
 
       lit = stdenv.mkDerivation rec {
         pname = "lit";
-        version = "3.8.1";
+        version = "3.8.5";
 
         src = pkgs.fetchFromGitHub {
           owner = "luvit";
           repo = "lit";
           rev = "${version}";
-          sha256 = "sha256-/Si340i40mDxWwcZcPpRrvl8tpZs+pJM5a2yY2Lpd6g=";
+          sha256 = "sha256-8Fy1jIDNSI/bYHmiGPEJipTEb7NYCbN3LsrME23sLqQ=";
           fetchSubmodules = true;
         };
 
