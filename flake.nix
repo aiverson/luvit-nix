@@ -51,16 +51,15 @@
           buildPhase = ''
             echo database: `pwd`/.litdb.git >> litconfig
             export LIT_CONFIG=`pwd`/litconfig
-            ln -s ${deps} ./deps
-            lit install || echo work around bug
-            lit make . ./$pname ${luviBase} || echo work around bug
+            ln -s ${deps}/deps ./deps
+            lit make . ./$pname ${luviBase} || echo "work around bug"
           '';
           installPhase = ''
             mkdir -p $out/bin
             cp ./$pname $out/bin/$pname
           '';
         } // args // {
-          buildInputs = [ lit curl ] ++ buildInputs;
+          buildInputs = [ lit luvi ] ++ buildInputs;
         });
     };
 
@@ -143,7 +142,8 @@
         buildInputs = [ luvi strace ];
         buildPhase = ''
           echo database: `pwd`/.litdb.git >> litconfig
-          LIT_CONFIG=`pwd`/litconfig luvi . -- make . ./lit ${luviBase} || echo work around bug
+          export LIT_CONFIG=`pwd`/litconfig
+          ${luvi}/bin/luvi . -- make . ./lit ${luviBase} || echo work around bug
         '';
         installPhase = ''
           mkdir -p $out/bin
