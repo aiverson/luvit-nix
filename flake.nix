@@ -88,13 +88,13 @@
 
       luvi = stdenv.mkDerivation rec {
         pname = "luvi";
-        version = "2.11.0";
+        version = "2.13.0";
 
         src = pkgs.fetchFromGitHub {
           owner = "luvit";
           repo = "luvi";
           rev = "v${version}";
-          sha256 = "VQCqyNQ9Ox+oE2u4l/O2czIBxTwSGfpEQdEjRgZCdOg=";
+          sha256 = "h9Xdm/+9X3AoqBj1LJftqn3+3PbdankfAJSBP3KnRgw=";
           fetchSubmodules = true;
         };
 
