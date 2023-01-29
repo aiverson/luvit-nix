@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-21.11";
+    nixpkgs.url = "github:nixos/nixpkgs";
     luvit = {
       url = "github:luvit/luvit";
       flake = false;
@@ -69,9 +69,9 @@
     packages.x86_64-linux = with pkgs; with self.lib; rec {
       luvit = makeLitPackage rec {
         pname = "luvit";
-        version = "2.17.0";
+        version = "2.18.1";
 
-        litSha256 = "sha256-3EYdIjxF6XvFE3Ft6qpx/gaySMKiZi3kKr2K7QPB+G0=";
+        litSha256 = "sha256-j01F5TDqBeVIbSohOyf9nuPxwWZtjS/Muy0jbYa0LZw=";
 
         src = inputs.luvit;
 
@@ -87,13 +87,13 @@
 
       luvi = stdenv.mkDerivation rec {
         pname = "luvi";
-        version = "2.13.0";
+        version = "2.14.0";
 
         src = pkgs.fetchFromGitHub {
           owner = "luvit";
           repo = "luvi";
           rev = "v${version}";
-          sha256 = "h9Xdm/+9X3AoqBj1LJftqn3+3PbdankfAJSBP3KnRgw=";
+          sha256 = "sha256-c1rvRDHSU23KwrfEAu+fhouoF16Sla6hWvxyvUb5/Kg=";
           fetchSubmodules = true;
         };
 
