@@ -8,9 +8,8 @@
   };
 
   outputs = inputs@{ self, nixpkgs, luvit }: let
-    pkgs = import nixpkgs {
-      system = "x86_64-linux";
-    };
+    system = "aarch64-darwin";
+    pkgs = import nixpkgs { inherit system; };
     aiverson = {
       name = "Alex Iverson";
       email = "alexjiverson@gmail.com";
@@ -64,9 +63,9 @@
     };
 
     # Specify the default package
-    defaultPackage.x86_64-linux = self.packages.x86_64-linux.luvit;
+    defaultPackage.${system} = self.packages.${system}.luvit;
 
-    packages.x86_64-linux = with pkgs; with self.lib; rec {
+    packages.${system} = with pkgs; with self.lib; rec {
       luvit = makeLitPackage rec {
         pname = "luvit";
         version = "2.17.0";
