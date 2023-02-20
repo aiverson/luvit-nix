@@ -86,7 +86,7 @@
 
       luvi = stdenv.mkDerivation rec {
         pname = "luvi";
-        version = "2.13.0";
+        version = "2.14.0";
 
         src = pkgs.fetchFromGitHub {
           owner = "luvit";
