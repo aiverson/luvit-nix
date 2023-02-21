@@ -80,7 +80,6 @@
 
           license = pkgs.lib.licenses.apsl20;
           maintainers = [ aiverson ];
-          platforms = pkgs.lib.platforms.linux;
         };
       };
 
@@ -121,7 +120,6 @@
 
           license = pkgs.lib.licenses.apsl20;
           maintainers = [ aiverson ];
-          platforms = pkgs.lib.platforms.linux;
         };
       };
 
@@ -138,7 +136,7 @@
           fetchSubmodules = true;
         };
 
-        buildInputs = [ luvi strace ];
+        buildInputs = [ luvi ];
         buildPhase = ''
           echo database: `pwd`/.litdb.git >> litconfig
           export LIT_CONFIG=`pwd`/litconfig
@@ -155,7 +153,6 @@
 
           license = pkgs.lib.licenses.apsl20;
           maintainers = [ aiverson ];
-          platforms = pkgs.lib.platforms.linux;
         };
       };
     };
