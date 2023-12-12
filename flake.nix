@@ -81,9 +81,9 @@
 
         luvit = self.lib.${system}.makeLitPackage {
           pname = "luvit";
-          version = "2.17.0";
+          version = "2.18.1-unstable";
 
-          litSha256 = "sha256-3EYdIjxF6XvFE3Ft6qpx/gaySMKiZi3kKr2K7QPB+G0=";
+          litSha256 = "sha256-W6VNp1jkDeafE4fdfK7xfX57wqkDQIyApBdF0R5/Jbo=";
 
           src = inputs.luvit;
 
