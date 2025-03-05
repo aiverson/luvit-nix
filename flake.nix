@@ -83,7 +83,7 @@
           pname = "luvit";
           version = "2.18.1-unstable";
 
-          litSha256 = "sha256-W6VNp1jkDeafE4fdfK7xfX57wqkDQIyApBdF0R5/Jbo=";
+          litSha256 = "sha256-7gQS402uvGnskLnvtX9B8Nj6wFuJmuXtViaq7hnk0Yo=";
 
           src = inputs.luvit;
 
@@ -108,6 +108,11 @@
             fetchSubmodules = true;
           };
 
+          patches = [
+            ./luvi/0001-CMake-non-internal-RPATH-cache-variables.patch
+            ./luvi/0002-Respect-provided-CMAKE_INSTALL_RPATH.patch
+          ];
+
           buildInputs = with pkgs; [ cmake openssl ];
 
           cmakeFlags = [
@@ -117,6 +122,8 @@
             "-DWithLPEG=ON"
             "-DWithSharedPCRE=OFF"
             "-DLUVI_VERSION=${version}"
+            "-DCMAKE_BUILD_WITH_INSTALL_RPATH=OFF"
+            "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=OFF"
           ];
 
           patchPhase = ''
