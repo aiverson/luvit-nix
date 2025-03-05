@@ -18,22 +18,6 @@
         "type": "github"
       }
     },
-    "luvit": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1737069002,
-        "narHash": "sha256-XBOLveJTBl0YpWSEHPxw5ChuVdcqpY2WnquHXiP1K8I=",
-        "owner": "luvit",
-        "repo": "luvit",
-        "rev": "c15b46a2ec9dd7c7e4c958c96c792d7028e4e95e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "luvit",
-        "repo": "luvit",
-        "type": "github"
-      }
-    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1740932899,
@@ -53,7 +37,6 @@
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
-        "luvit": "luvit",
         "nixpkgs": "nixpkgs"
       }
     },

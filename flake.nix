@@ -2,13 +2,9 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
     flake-utils.url = "github:numtide/flake-utils";
-    luvit = {
-      url = "github:luvit/luvit";
-      flake = false;
-    };
   };
 
-  outputs = inputs@{ self, nixpkgs, flake-utils, luvit }: let
+  outputs = inputs@{ self, nixpkgs, flake-utils }: let
     aiverson = {
       name = "Alex Iverson";
       email = "alexjiverson@gmail.com";
@@ -81,11 +77,17 @@
 
         luvit = self.lib.${system}.makeLitPackage {
           pname = "luvit";
-          version = "2.18.1-unstable";
+          version = "unstable-2022-01-19";
 
-          litSha256 = "sha256-7gQS402uvGnskLnvtX9B8Nj6wFuJmuXtViaq7hnk0Yo=";
+          # This needs invalidated when updating src
+          litSha256 = "sha256-3EYdIjxF6XvFE3Ft6qpx/gaySMKiZi3kKr2K7QPB+G0=";
 
-          src = inputs.luvit;
+          src = pkgs.fetchFromGitHub {
+            owner = "luvit";
+            repo = "luvit";
+            rev = "3f328ad928eb214f6438dd25fb9ee8b5c1e9255c";
+            hash = "sha256-TNiD6GPnS8O2d53sJ52xWYqMAXrVJu2lkfXhf2jWuL0=";
+          };
 
           meta = {
             description = "a lua runtime for application";
