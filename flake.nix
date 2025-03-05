@@ -139,6 +139,7 @@
             homepage = "https://github.com/luvit/luvi";
 
             license = pkgs.lib.licenses.apsl20;
+            mainProgram = "luvit";
             maintainers = [ aiverson ];
           };
         };
@@ -171,6 +172,7 @@
             homepage = "https://github.com/luvit/lit";
 
             license = pkgs.lib.licenses.apsl20;
+            mainProgram = "lit";
             maintainers = [ aiverson ];
           };
         };
