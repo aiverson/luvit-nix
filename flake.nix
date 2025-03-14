@@ -1,14 +1,10 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-21.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
     flake-utils.url = "github:numtide/flake-utils";
-    luvit = {
-      url = "github:luvit/luvit";
-      flake = false;
-    };
   };
 
-  outputs = inputs@{ self, nixpkgs, flake-utils, luvit }: let
+  outputs = inputs@{ self, nixpkgs, flake-utils }: let
     aiverson = {
       name = "Alex Iverson";
       email = "alexjiverson@gmail.com";
@@ -81,11 +77,17 @@
 
         luvit = self.lib.${system}.makeLitPackage {
           pname = "luvit";
-          version = "2.17.0";
+          version = "unstable-2022-01-19";
 
+          # This needs invalidated when updating src
           litSha256 = "sha256-3EYdIjxF6XvFE3Ft6qpx/gaySMKiZi3kKr2K7QPB+G0=";
 
-          src = inputs.luvit;
+          src = pkgs.fetchFromGitHub {
+            owner = "luvit";
+            repo = "luvit";
+            rev = "3f328ad928eb214f6438dd25fb9ee8b5c1e9255c";
+            hash = "sha256-TNiD6GPnS8O2d53sJ52xWYqMAXrVJu2lkfXhf2jWuL0=";
+          };
 
           meta = {
             description = "a lua runtime for application";
@@ -108,6 +110,11 @@
             fetchSubmodules = true;
           };
 
+          patches = [
+            ./luvi/0001-CMake-non-internal-RPATH-cache-variables.patch
+            ./luvi/0002-Respect-provided-CMAKE_INSTALL_RPATH.patch
+          ];
+
           buildInputs = with pkgs; [ cmake openssl ];
 
           cmakeFlags = [
@@ -117,6 +124,8 @@
             "-DWithLPEG=ON"
             "-DWithSharedPCRE=OFF"
             "-DLUVI_VERSION=${version}"
+            "-DCMAKE_BUILD_WITH_INSTALL_RPATH=OFF"
+            "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=OFF"
           ];
 
           patchPhase = ''
@@ -132,6 +141,7 @@
             homepage = "https://github.com/luvit/luvi";
 
             license = pkgs.lib.licenses.apsl20;
+            mainProgram = "luvit";
             maintainers = [ aiverson ];
           };
         };
@@ -164,6 +174,7 @@
             homepage = "https://github.com/luvit/lit";
 
             license = pkgs.lib.licenses.apsl20;
+            mainProgram = "lit";
             maintainers = [ aiverson ];
           };
         };
