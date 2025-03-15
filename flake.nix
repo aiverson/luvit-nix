@@ -47,13 +47,14 @@
             outputHash = sha256;
           });
         
-        makeLitPackage = { buildInputs ? [ ], src, pname, litSha256, ... }@args:
+        makeLitPackage = { buildInputs ? [ ], nativeBuildInputs ? [ ], src, pname, litSha256, ... }@args:
           let
             deps = vendorLitDeps {
               inherit src pname;
               sha256 = litSha256;
             };
           in pkgs.stdenv.mkDerivation ({
+            strictDeps = true;
             buildPhase = ''
               echo database: `pwd`/.litdb.git >> litconfig
               export LIT_CONFIG=`pwd`/litconfig
@@ -66,7 +67,8 @@
             '';
             meta.mainProgram = pname;
           } // args // {
-            buildInputs = with selfPkgs; [ lit luvi ] ++ buildInputs;
+            nativeBuildInputs = with selfPkgs; [ lit ] ++ nativeBuildInputs;
+            buildInputs = with selfPkgs; [ luvi lit ] ++ buildInputs;
           });
       };
 
