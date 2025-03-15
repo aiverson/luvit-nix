@@ -56,14 +56,18 @@
           in pkgs.stdenv.mkDerivation ({
             strictDeps = true;
             buildPhase = ''
+              runHook preBuild
               echo database: `pwd`/.litdb.git >> litconfig
               export LIT_CONFIG=`pwd`/litconfig
               ln -s ${deps}/deps ./deps
               lit make . ./$pname ${luviBase} || echo "work around bug"
+              runHook postBuild
             '';
             installPhase = ''
+              runHook preInstall
               mkdir -p $out/bin
               cp ./$pname $out/bin/$pname
+              runHook postInstall
             '';
             meta.mainProgram = pname;
           } // args // {
