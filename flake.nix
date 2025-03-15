@@ -81,16 +81,16 @@
 
         luvit = self.lib.${system}.makeLitPackage {
           pname = "luvit";
-          version = "unstable-2022-01-19";
+          version = "unstable-2024-11-26";
 
           # This needs invalidated when updating src
-          litSha256 = "sha256-3EYdIjxF6XvFE3Ft6qpx/gaySMKiZi3kKr2K7QPB+G0=";
+          litSha256 = "sha256-AYMQi3d3wOH7jz/E4wSV7Kjx+/O6mkhkYJpFXVnCvtI=";
 
           src = pkgs.fetchFromGitHub {
             owner = "luvit";
             repo = "luvit";
-            rev = "3f328ad928eb214f6438dd25fb9ee8b5c1e9255c";
-            hash = "sha256-TNiD6GPnS8O2d53sJ52xWYqMAXrVJu2lkfXhf2jWuL0=";
+            rev = "eb8dd116eecf6ac33f293c32c8d59ff86cb290fa";
+            hash = "sha256-udkNmMr8pErzCWrtF+K5uE8Do82TJGW4Uh+JS27ZxKk=";
           };
 
           meta = {
@@ -103,42 +103,41 @@
           };
         };
 
-        luvi = pkgs.stdenv.mkDerivation rec {
+        luvi = pkgs.stdenv.mkDerivation (finalAttrs: {
           pname = "luvi";
-          version = "2.14.0";
+          version = "2.15.0";
+          strictDeps = true;
 
           src = pkgs.fetchFromGitHub {
             owner = "luvit";
             repo = "luvi";
-            rev = "v${version}";
-            sha256 = "sha256-c1rvRDHSU23KwrfEAu+fhouoF16Sla6hWvxyvUb5/Kg=";
+            rev = "v${finalAttrs.version}";
+            sha256 = "sha256-+mVoL/B3hBt2SHAjEQdN0XUhb3WF3wbYPwgArkVEP4M=";
             fetchSubmodules = true;
           };
 
-          patches = [
-            ./luvi/0001-CMake-non-internal-RPATH-cache-variables.patch
-            ./luvi/0002-Respect-provided-CMAKE_INSTALL_RPATH.patch
-          ];
-
-          buildInputs = with pkgs; [ cmake openssl ];
+          nativeBuildInputs = with pkgs; [ cmake ];
+          buildInputs = with pkgs; [ openssl zlib ];
 
           cmakeFlags = [
             "-DWithOpenSSL=ON"
-            "-DWithSharedOpenSSL=ON"
             "-DWithPCRE=ON"
             "-DWithLPEG=ON"
-            "-DWithSharedPCRE=OFF"
-            "-DLUVI_VERSION=${version}"
-            "-DCMAKE_BUILD_WITH_INSTALL_RPATH=OFF"
-            "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=OFF"
+            "-DWithZLIB=ON"
+            "-DWithSharedOpenSSL=ON"
+            "-DWithSharedPCRE=ON"
+            "-DWithSharedLPEG=ON"
+            "-DWithSharedZLIB=ON"
+            "-DLUVI_VERSION=${finalAttrs.version}"
           ];
 
-          patchPhase = ''
-            echo ${version} >> VERSION
-          '';
-          installPhase = ''
-            mkdir -p $out/bin
-            cp luvi $out/bin/luvi
+          # Fix version, convince luv not to install staticlib/headers
+          postPatch = ''
+            echo ${finalAttrs.version} >> VERSION
+            substituteInPlace ./deps/luv/deps/luajit.cmake \
+              --replace-fail 'git show' 'true'
+            substituteInPlace ./deps/luv/CMakeLists.txt \
+              --replace-fail 'if (CMAKE_INSTALL_PREFIX)' 'if (FALSE)'
           '';
 
           meta = {
@@ -149,7 +148,7 @@
             mainProgram = "luvi";
             maintainers = [ aiverson ];
           };
-        };
+        });
 
         lit = pkgs.stdenv.mkDerivation rec {
           pname = "lit";
