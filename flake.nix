@@ -179,5 +179,15 @@
           };
         };
       };
+
+      checks = {
+        simple-lpeg = pkgs.runCommandNoCC "simple-lpeg-check" {
+          strictDeps = true;
+          nativeBuildInputs = [ selfPkgs.luvit ];
+        } ''
+          luvit ${./checks/simple-lpeg.lua} || exit 1
+          mkdir $out
+        '';
+      } // selfPkgs;
     });
 }
