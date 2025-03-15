@@ -64,6 +64,7 @@
               mkdir -p $out/bin
               cp ./$pname $out/bin/$pname
             '';
+            meta.mainProgram = pname;
           } // args // {
             buildInputs = with selfPkgs; [ lit luvi ] ++ buildInputs;
           });
@@ -94,6 +95,7 @@
             homepage = "https://github.com/luvit/luvi";
 
             license = pkgs.lib.licenses.apsl20;
+            mainProgram = "luvit";
             maintainers = [ aiverson ];
           };
         };
@@ -141,7 +143,7 @@
             homepage = "https://github.com/luvit/luvi";
 
             license = pkgs.lib.licenses.apsl20;
-            mainProgram = "luvit";
+            mainProgram = "luvi";
             maintainers = [ aiverson ];
           };
         };
