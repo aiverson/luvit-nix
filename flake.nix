@@ -76,9 +76,6 @@
           });
       };
 
-      # defaultPackage is depricated in nix 2.13, using this for compatibility
-      defaultPackage = selfPkgs.default;
-
       packages = rec {
         default = luvit;
 
