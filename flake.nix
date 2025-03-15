@@ -47,97 +47,54 @@
             outputHash = sha256;
           });
         
-        makeLitPackage = { buildInputs ? [ ], src, pname, litSha256, ... }@args:
+        makeLitPackage = { buildInputs ? [ ], nativeBuildInputs ? [ ], src, pname, litSha256, ... }@args:
           let
             deps = vendorLitDeps {
               inherit src pname;
               sha256 = litSha256;
             };
           in pkgs.stdenv.mkDerivation ({
+            strictDeps = true;
             buildPhase = ''
+              runHook preBuild
               echo database: `pwd`/.litdb.git >> litconfig
               export LIT_CONFIG=`pwd`/litconfig
               ln -s ${deps}/deps ./deps
               lit make . ./$pname ${luviBase} || echo "work around bug"
+              runHook postBuild
             '';
             installPhase = ''
+              runHook preInstall
               mkdir -p $out/bin
               cp ./$pname $out/bin/$pname
+              runHook postInstall
             '';
+            meta.mainProgram = pname;
           } // args // {
-            buildInputs = with selfPkgs; [ lit luvi ] ++ buildInputs;
+            nativeBuildInputs = with selfPkgs; [ lit ] ++ nativeBuildInputs;
+            buildInputs = with selfPkgs; [ luvi lit ] ++ buildInputs;
           });
       };
-
-      # defaultPackage is depricated in nix 2.13, using this for compatibility
-      defaultPackage = selfPkgs.default;
 
       packages = rec {
         default = luvit;
 
         luvit = self.lib.${system}.makeLitPackage {
           pname = "luvit";
-          version = "unstable-2022-01-19";
+          version = "unstable-2024-11-26";
 
           # This needs invalidated when updating src
-          litSha256 = "sha256-3EYdIjxF6XvFE3Ft6qpx/gaySMKiZi3kKr2K7QPB+G0=";
+          litSha256 = "sha256-AYMQi3d3wOH7jz/E4wSV7Kjx+/O6mkhkYJpFXVnCvtI=";
 
           src = pkgs.fetchFromGitHub {
             owner = "luvit";
             repo = "luvit";
-            rev = "3f328ad928eb214f6438dd25fb9ee8b5c1e9255c";
-            hash = "sha256-TNiD6GPnS8O2d53sJ52xWYqMAXrVJu2lkfXhf2jWuL0=";
+            rev = "eb8dd116eecf6ac33f293c32c8d59ff86cb290fa";
+            hash = "sha256-udkNmMr8pErzCWrtF+K5uE8Do82TJGW4Uh+JS27ZxKk=";
           };
 
           meta = {
             description = "a lua runtime for application";
-            homepage = "https://github.com/luvit/luvi";
-
-            license = pkgs.lib.licenses.apsl20;
-            maintainers = [ aiverson ];
-          };
-        };
-
-        luvi = pkgs.stdenv.mkDerivation rec {
-          pname = "luvi";
-          version = "2.14.0";
-
-          src = pkgs.fetchFromGitHub {
-            owner = "luvit";
-            repo = "luvi";
-            rev = "v${version}";
-            sha256 = "sha256-c1rvRDHSU23KwrfEAu+fhouoF16Sla6hWvxyvUb5/Kg=";
-            fetchSubmodules = true;
-          };
-
-          patches = [
-            ./luvi/0001-CMake-non-internal-RPATH-cache-variables.patch
-            ./luvi/0002-Respect-provided-CMAKE_INSTALL_RPATH.patch
-          ];
-
-          buildInputs = with pkgs; [ cmake openssl ];
-
-          cmakeFlags = [
-            "-DWithOpenSSL=ON"
-            "-DWithSharedOpenSSL=ON"
-            "-DWithPCRE=ON"
-            "-DWithLPEG=ON"
-            "-DWithSharedPCRE=OFF"
-            "-DLUVI_VERSION=${version}"
-            "-DCMAKE_BUILD_WITH_INSTALL_RPATH=OFF"
-            "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=OFF"
-          ];
-
-          patchPhase = ''
-            echo ${version} >> VERSION
-          '';
-          installPhase = ''
-            mkdir -p $out/bin
-            cp luvi $out/bin/luvi
-          '';
-
-          meta = {
-            description = "a lua runtime for applications";
             homepage = "https://github.com/luvit/luvi";
 
             license = pkgs.lib.licenses.apsl20;
@@ -146,9 +103,57 @@
           };
         };
 
+        luvi = pkgs.stdenv.mkDerivation (finalAttrs: {
+          pname = "luvi";
+          version = "2.15.0";
+          strictDeps = true;
+
+          src = pkgs.fetchFromGitHub {
+            owner = "luvit";
+            repo = "luvi";
+            rev = "v${finalAttrs.version}";
+            sha256 = "sha256-+mVoL/B3hBt2SHAjEQdN0XUhb3WF3wbYPwgArkVEP4M=";
+            fetchSubmodules = true;
+          };
+
+          nativeBuildInputs = with pkgs; [ cmake ];
+          buildInputs = with pkgs; [ openssl zlib ];
+
+          cmakeFlags = [
+            "-DWithOpenSSL=ON"
+            "-DWithPCRE=ON"
+            "-DWithLPEG=ON"
+            "-DWithZLIB=ON"
+            "-DWithSharedOpenSSL=ON"
+            "-DWithSharedPCRE=ON"
+            "-DWithSharedLPEG=ON"
+            "-DWithSharedZLIB=ON"
+            "-DLUVI_VERSION=${finalAttrs.version}"
+          ];
+
+          # Fix version, convince luv not to install staticlib/headers
+          postPatch = ''
+            echo ${finalAttrs.version} >> VERSION
+            substituteInPlace ./deps/luv/deps/luajit.cmake \
+              --replace-fail 'git show' 'true'
+            substituteInPlace ./deps/luv/CMakeLists.txt \
+              --replace-fail 'if (CMAKE_INSTALL_PREFIX)' 'if (FALSE)'
+          '';
+
+          meta = {
+            description = "a lua runtime for applications";
+            homepage = "https://github.com/luvit/luvi";
+
+            license = pkgs.lib.licenses.apsl20;
+            mainProgram = "luvi";
+            maintainers = [ aiverson ];
+          };
+        });
+
         lit = pkgs.stdenv.mkDerivation rec {
           pname = "lit";
           version = "3.8.5";
+          strictDeps = true;
 
           src = pkgs.fetchFromGitHub {
             owner = "luvit";
@@ -158,11 +163,11 @@
             fetchSubmodules = true;
           };
 
-          buildInputs = [ selfPkgs.luvi ];
+          nativeBuildInputs = [ selfPkgs.luvi ];
           buildPhase = ''
             echo database: `pwd`/.litdb.git >> litconfig
             export LIT_CONFIG=`pwd`/litconfig
-            ${selfPkgs.luvi}/bin/luvi . -- make . ./lit ${selfLib.luviBase} || echo work around bug
+            luvi . -- make . ./lit ${selfLib.luviBase} || echo work around bug
           '';
           installPhase = ''
             mkdir -p $out/bin
@@ -179,5 +184,15 @@
           };
         };
       };
+
+      checks = {
+        simple-lpeg = pkgs.runCommandNoCC "simple-lpeg-check" {
+          strictDeps = true;
+          nativeBuildInputs = [ selfPkgs.luvit ];
+        } ''
+          luvit ${./checks/simple-lpeg.lua} || exit 1
+          mkdir $out
+        '';
+      } // selfPkgs;
     });
 }
