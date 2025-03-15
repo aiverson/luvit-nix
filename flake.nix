@@ -153,6 +153,7 @@
         lit = pkgs.stdenv.mkDerivation rec {
           pname = "lit";
           version = "3.8.5";
+          strictDeps = true;
 
           src = pkgs.fetchFromGitHub {
             owner = "luvit";
@@ -162,11 +163,11 @@
             fetchSubmodules = true;
           };
 
-          buildInputs = [ selfPkgs.luvi ];
+          nativeBuildInputs = [ selfPkgs.luvi ];
           buildPhase = ''
             echo database: `pwd`/.litdb.git >> litconfig
             export LIT_CONFIG=`pwd`/litconfig
-            ${selfPkgs.luvi}/bin/luvi . -- make . ./lit ${selfLib.luviBase} || echo work around bug
+            luvi . -- make . ./lit ${selfLib.luviBase} || echo work around bug
           '';
           installPhase = ''
             mkdir -p $out/bin
