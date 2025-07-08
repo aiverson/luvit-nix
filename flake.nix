@@ -59,6 +59,7 @@
               runHook preBuild
               echo database: `pwd`/.litdb.git >> litconfig
               export LIT_CONFIG=`pwd`/litconfig
+              export UV_USE_IO_URING=0
               ln -s ${deps}/deps ./deps
               lit make . ./$pname ${luviBase} || echo "work around bug"
               runHook postBuild
