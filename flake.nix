@@ -107,7 +107,7 @@
           pname = "luvi";
           version = "2.15.0";
           strictDeps = true;
-
+          
           src = pkgs.fetchFromGitHub {
             owner = "luvit";
             repo = "luvi";
@@ -154,6 +154,7 @@
           pname = "lit";
           version = "3.8.5";
           strictDeps = true;
+          env.UV_USE_IO_URING = 0;
 
           src = pkgs.fetchFromGitHub {
             owner = "luvit";
